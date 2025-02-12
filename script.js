@@ -10,12 +10,14 @@ const GameBoard = (() => {
         return false;
     };
     const resetBoard = () => board.fill();
+
+    return { getboard, updateBoard, resetBoard };
 })();
 
 const Player = (name, marker) => ({ name, marker });
 
 
-const GameController = () => {
+const GameController = (() => {
     const player1 = Player("Player 1", "X");
     const player2 = Player("Player 2", "O");
     let currentPlayer = player1;
@@ -36,35 +38,59 @@ const GameController = () => {
 
         for (i = 0; i < winPatterns.length; i++) {
             const [a, b, c] = winPatterns[i];
-            if (board[a] && board()[a] === board()[b] && board()[a] === board()[c]) {
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
                 return board[a]; // Returns "X" or "O" if there's a winner
             }
         }
         return board.includes("") ? null : "draw";  // Returns "draw" if there's a draw
     };
-    return {getCurrentPlayer, changePlayer, checkForWin};
-}
+    return { getCurrentPlayer, changePlayer, checkForWin };
+})();
 
 const DisplayController = (() => {
     const gameBoardelement = document.getElementById("game-board");
     const messageElement = document.getElementById("message");
     const restartButton = document.getElementById("restartbtn");
 
-    function render(){
+    function render() {
         gameBoardelement.innerHTML = "";
         const board = GameBoard.getboard();
         board.forEach((cell, index) => {
             const cellElement = document.createElement("div");
             cellElement.classList.add("cell");
             cellElement.textContent = cell;
-            cellElement.addEventListener("click", () => cellClick(index));
+            cellElement.addEventListener("click", () => handleMove(index));
             gameBoardelement.appendChild(cellElement);
         });
 
     }
 
-    function handleMove (index){
-        
+    function handleMove(index) {
+        if (GameBoard.updateBoard(index, GameController.getCurrentPlayer().marker)) {
+            render();
+            const result = GameController.checkForWin();
+            if (result) {
+                if (result === "draw") {
+                    messageElement.textContent = "It's a draw!";
+                } else {
+                    messageElement.textContent = `${result} wins!`;
+                }
+                return;
+            }
+            GameController.changePlayer();
+            messageElement.textContent = `${GameController.getCurrentPlayer().name}'s turn`;
+        }
     }
-        
+
+
+    restartButton.addEventListener("click", () => {
+        GameBoard.resetBoard();
+        GameController.changePlayer();
+        messageElement.textContent = `${GameController.getCurrentPlayer().name}'s turn`;
+
+    });
+    return { render };
+
 })();
+
+DisplayController.render();
