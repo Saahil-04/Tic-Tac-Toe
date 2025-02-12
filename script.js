@@ -43,6 +43,7 @@ const GameController = (() => {
         for (i = 0; i < winPatterns.length; i++) {
             const [a, b, c] = winPatterns[i];
             if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                // drawWinningLine(pattern); // Draws a line through the winning cells
                 return board[a]; // Returns "X" or "O" if there's a winner
             }
         }
@@ -65,6 +66,9 @@ const DisplayController = (() => {
             cellElement.textContent = cell;
             cellElement.addEventListener("click", () => handleMove(index));
             gameBoardelement.appendChild(cellElement);
+            if(board[index] !== "") {
+                cellElement.classList.add('taken');
+            }
         });
 
     }
