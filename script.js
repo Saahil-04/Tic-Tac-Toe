@@ -9,7 +9,11 @@ const GameBoard = (() => {
         }
         return false;
     };
-    const resetBoard = () => board.fill();
+    const resetBoard = () => {
+        board = ["", "", "", "", "", "", "", "", ""];
+        console.log(board);
+        return board;
+    }
 
     return { getboard, updateBoard, resetBoard };
 })();
@@ -84,10 +88,11 @@ const DisplayController = (() => {
 
 
     restartButton.addEventListener("click", () => {
+        console.log("restart button clicked")
         GameBoard.resetBoard();
         GameController.changePlayer();
         messageElement.textContent = `${GameController.getCurrentPlayer().name}'s turn`;
-
+        render();
     });
     return { render };
 
